@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Literum - Book Information</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --cream: #faf8f5;
+            --dark-brown: #2b2416;
+            --sage: #7a8e6f;
+            --gold: #c9a96e;
+            --light-border: #e8e4df;
+            --hover-bg: #f0ebe6;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background-color: var(--cream);
+            color: var(--dark-brown);
+            line-height: 1.6;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .header {
+            padding: 1.5rem 2rem;
+            border-bottom: 2px solid var(--light-border);
+            background-color: var(--cream);
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 400;
+            letter-spacing: 2px;
+            color: var(--dark-brown);
+        }
+
+        .header p {
+            font-size: 0.9rem;
+            color: var(--sage);
+            margin-top: 0.25rem;
+            font-style: italic;
+        }
+
+        .container {
+            display: flex;
+            height: calc(100vh - 90px);
+        }
+
+        .sidebar {
+            width: 30%;
+            border-right: 2px solid var(--light-border);
+            background-color: #fdfbf9;
+            overflow-y: auto;
+            padding: 1.5rem 0;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--sage);
+        }
+
+        .books-list {
+            list-style: none;
+        }
+
+        .book-item {
+            padding: 1rem 1.5rem;
+            border-left: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            border-bottom: 1px solid var(--light-border);
+        }
+
+        .book-item:hover {
+            background-color: var(--hover-bg);
+            border-left-color: var(--gold);
+        }
+
+        .book-item.active {
+            background-color: var(--hover-bg);
+            border-left-color: var(--sage);
+        }
+
+        .book-item-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--dark-brown);
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+
+        .book-item-author {
+            font-size: 0.8rem;
+            color: var(--sage);
+            font-style: italic;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            background-color: var(--cream);
+        }
+
+        .book-detail {
+            display: none;
+        }
+
+        .book-detail.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .book-cover-wrapper {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .book-cover {
+            width: 180px;
+            height: 260px;
+            background: linear-gradient(135deg, var(--sage) 0%, var(--gold) 100%);
+            border: 2px solid var(--dark-brown);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .book-header {
+            flex: 1;
+        }
+
+        .book-title {
+            font-size: 2rem;
+            font-weight: 400;
+            color: var(--dark-brown);
+            margin-bottom: 0.5rem;
+            line-height: 1.2;
+        }
+
+        .book-author {
+            font-size: 1.1rem;
+            color: var(--sage);
+            font-style: italic;
+            margin-bottom: 1rem;
+        }
+
+        .book-meta {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .meta-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--sage);
+            margin-bottom: 0.3rem;
+        }
+
+        .meta-value {
+            font-weight: 600;
+            color: var(--dark-brown);
+        }
+
+        .rating {
+            font-size: 1rem;
+            color: var(--gold);
+        }
+
+        .divider {
+            height: 1px;
+            background-color: var(--light-border);
+            margin: 2rem 0;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark-brown);
+            margin-bottom: 1rem;
+        }
+
+        .description {
+            font-size: 0.95rem;
+            line-height: 1.7;
+            color: var(--dark-brown);
+            max-width: 65ch;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .tag {
+            background-color: var(--hover-bg);
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            color: var(--sage);
+            border: 1px solid var(--light-border);
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--sage);
+            margin-bottom: 0.5rem;
+        }
+
+        .detail-value {
+            font-size: 0.95rem;
+            color: var(--dark-brown);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--sage);
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--cream);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--light-border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--sage);
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 2px solid var(--light-border);
+                max-height: 40vh;
+            }
+
+            .main-content {
+                flex: 1;
+            }
+
+            .book-cover-wrapper {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .book-title {
+                font-size: 1.5rem;
+            }
+
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Literum</h1>
+        <p>Discover books worth reading</p>
+    </div>
+
+    <div class="container">
+        <aside class="sidebar">
+            <div class="sidebar-header">Books Library</div>
+            <ul class="books-list" id="booksList"></ul>
+        </aside>
+
+        <main class="main-content" id="mainContent">
+            <div class="empty-state">
+                <div class="empty-state-icon">📚</div>
+                <p>Select a book from the library to view details</p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const books = [
+            {
+                id: 1,
+                title: "To Kill a Mockingbird",
+                author: "Harper Lee",
+                year: 1960,
+                rating: 4.8,
+                pages: 281,
+                genre: "Fiction, Classic",
+                publisher: "J.B. Lippincott",
+                description: "A gripping tale of racial injustice and childhood innocence in the American South. Through the eyes of Scout Finch, we witness her father's courageous defense of a Black man falsely accused of crime, exploring themes of morality, prejudice, and the loss of innocence.",
+                tags: ["Classic Literature", "Social Justice", "Coming of Age", "American South"]
+            },
+            {
+                id: 2,
+                title: "1984",
+                author: "George Orwell",
+                year: 1949,
+                rating: 4.7,
+                pages: 328,
+                genre: "Dystopian, Science Fiction",
+                publisher: "Secker & Warburg",
+                description: "A chilling exploration of totalitarianism and surveillance in a dystopian future. Winston Smith's struggle against an oppressive government reveals the dangers of absolute power, propaganda, and the erasure of individual thought and freedom.",
+                tags: ["Dystopian", "Political", "Surveillance", "Philosophy"]
+            },
+            {
+                id: 3,
+                title: "The Great Gatsby",
+                author: "F. Scott Fitzgerald",
+                year: 1925,
+                rating: 4.6,
+                pages: 180,
+                genre: "Fiction, Classic",
+                publisher: "Scribner",
+                description: "A masterpiece of American literature capturing the essence of the Jazz Age. The story of Jay Gatsby's obsessive love and the moral decay beneath the glittering surface of wealth and excess in the 1920s.",
+                tags: ["American Dream", "Jazz Age", "Romance", "Wealth"]
+            },
+            {
+                id: 4,
+                title: "Pride and Prejudice",
+                author: "Jane Austen",
+                year: 1813,
+                rating: 4.9,
+                pages: 432,
+                genre: "Romance, Classic",
+                publisher: "T. Egerton",
+                description: "An enduring classic of English literature exploring love, marriage, and social class in Regency England. Elizabeth Bennet's wit and independence challenge the conventions of her time as she navigates society, family expectations, and an unexpected romance.",
+                tags: ["Romance", "Social Commentary", "Wit", "19th Century"]
+            },
+            {
+                id: 5,
+                title: "The Catcher in the Rye",
+                author: "J.D. Salinger",
+                year: 1951,
+                rating: 4.5,
+                pages: 277,
+                genre: "Fiction, Classic",
+                publisher: "Little, Brown",
+                description: "A controversial and iconic coming-of-age novel following Holden Caulfield through New York City. His cynical observations about adult society, depression, and alienation resonate with readers seeking authenticity in a world of 'phoniness.'",
+                tags: ["Coming of Age", "Alienation", "Mental Health", "Youth"]
+            },
+            {
+                id: 6,
+                title: "Brave New World",
+                author: "Aldous Huxley",
+                year: 1932,
+                rating: 4.6,
+                pages: 288,
+                genre: "Dystopian, Science Fiction",
+                publisher: "Chatto & Windus",
+                description: "A thought-provoking vision of a future society built on scientific advancement, conditioning, and consumption. Huxley's dystopia explores what happens when happiness is enforced and individuality is suppressed in pursuit of social stability.",
+                tags: ["Dystopian", "Future Society", "Control", "Happiness"]
+            },
+            {
+                id: 7,
+                title: "The Hobbit",
+                author: "J.R.R. Tolkien",
+                year: 1937,
+                rating: 4.8,
+                pages: 310,
+                genre: "Fantasy, Adventure",
+                publisher: "Allen & Unwin",
+                description: "An enchanting adventure following Bilbo Baggins from the comfort of the Shire into a world of dragons, dwarves, and danger. A timeless fantasy that explores courage, friendship, and the hero within every individual.",
+                tags: ["Fantasy", "Adventure", "Quest", "Heroism"]
+            },
+            {
+                id: 8,
+                title: "Jane Eyre",
+                author: "Charlotte Brontë",
+                year: 1847,
+                rating: 4.7,
+                pages: 507,
+                genre: "Romance, Gothic, Classic",
+                publisher: "Smith, Elder",
+                description: "A Gothic romance featuring Jane Eyre, a strong-willed orphan who endures hardship with dignity. Her passionate relationship with Mr. Rochester and her refusal to compromise her principles make her one of literature's most compelling heroines.",
+                tags: ["Gothic", "Romance", "Female Protagonist", "19th Century"]
+            }
+        ];
+
+        const booksList = document.getElementById('booksList');
+        const mainContent = document.getElementById('mainContent');
+
+        // Render books list
+        function renderBooksList() {
+            booksList.innerHTML = books.map(book => `
+                <li class="book-item" data-id="${book.id}">
+                    <span class="book-item-title">${book.title}</span>
+                    <span class="book-item-author">${book.author}</span>
+                </li>
+            `).join('');
+
+            // Add click handlers
+            document.querySelectorAll('.book-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const id = parseInt(item.dataset.id);
+                    showBook(id);
+                    
+                    // Update active state
+                    document.querySelectorAll('.book-item').forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                });
+            });
+
+            // Auto-select first book
+            document.querySelector('.book-item').click();
+        }
+
+        // Show book details
+        function showBook(id) {
+            const book = books.find(b => b.id === id);
+            if (!book) return;
+
+            const stars = '★'.repeat(Math.floor(book.rating)) + (book.rating % 1 > 0 ? '☆' : '');
+
+            mainContent.innerHTML = `
+                <div class="book-detail active">
+                    <div class="book-cover-wrapper">
+                        <div class="book-cover">📖</div>
+                        <div class="book-header">
+                            <h2 class="book-title">${book.title}</h2>
+                            <div class="book-author">by ${book.author}</div>
+                            <div class="book-meta">
+                                <div class="meta-item">
+                                    <span class="meta-label">Published</span>
+                                    <span class="meta-value">${book.year}</span>
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-label">Rating</span>
+                                    <span class="meta-value"><span class="rating">${stars}</span> ${book.rating}/5</span>
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-label">Pages</span>
+                                    <span class="meta-value">${book.pages}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <h3 class="section-title">About</h3>
+                    <p class="description">${book.description}</p>
+
+                    <h3 class="section-title" style="margin-top: 2rem;">Details</h3>
+                    <div class="details-grid">
+                        <div class="detail-item">
+                            <span class="detail-label">Genre</span>
+                            <span class="detail-value">${book.genre}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Publisher</span>
+                            <span class="detail-value">${book.publisher}</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="section-title" style="margin-top: 2rem;">Tags</h3>
+                        <div class="tags">
+                            ${book.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Initialize
+        renderBooksList();
+    </script>
+</body>
+</html>
