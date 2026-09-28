@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Precision Arithmetic Calculator</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#eef1f4; --panel:#ffffff; --ink:#18242f; --muted:#5d6b78; --line:#d5dce3;
+  --accent:#0f5f63; --accent-ink:#ffffff; --field:#f8fafb; --error:#b3261e; --result:#e6f1f1;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#10171d; --panel:#18222b; --ink:#e8eef3; --muted:#93a3b1; --line:#2b3a46;
+    --accent:#4fb3b8; --accent-ink:#06282a; --field:#111a21; --error:#ff8a80; --result:#173235;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#10171d; --panel:#18222b; --ink:#e8eef3; --muted:#93a3b1; --line:#2b3a46;
+  --accent:#4fb3b8; --accent-ink:#06282a; --field:#111a21; --error:#ff8a80; --result:#173235;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.shell{max-width:920px;margin:0 auto;padding:40px 20px}
+header{margin-bottom:28px}
+h1{margin:0 0 8px;font:600 2rem/1.2 "IBM Plex Serif",Georgia,"Times New Roman",serif;letter-spacing:-.01em}
+header p{margin:0;color:var(--muted);max-width:60ch}
+.grid{display:grid;grid-template-columns:3fr 2fr;gap:24px;align-items:start}
+@media (max-width:760px){.grid{grid-template-columns:1fr}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:24px}
+h2{margin:0 0 18px;font:600 1.1rem/1.3 "IBM Plex Serif",Georgia,serif}
+label,legend{display:block;font-size:.875rem;font-weight:500;margin-bottom:6px}
+fieldset{border:0;padding:0;margin:0 0 20px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+@media (max-width:480px){.row{grid-template-columns:1fr}}
+input[type=number]{width:100%;padding:11px 12px;font:inherit;font-size:1.05rem;font-variant-numeric:tabular-nums;color:var(--ink);background:var(--field);border:1px solid var(--line);border-radius:6px}
+input[type=number]:focus-visible,button:focus-visible,.ops input:focus-visible+label{outline:2px solid var(--accent);outline-offset:2px}
+input[aria-invalid="true"]{border-color:var(--error)}
+.ops{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.ops input{position:absolute;opacity:0;pointer-events:none}
+.ops label{margin:0;text-align:center;padding:10px 4px;border:1px solid var(--line);border-radius:6px;background:var(--field);cursor:pointer;font-weight:500;transition:background .15s,color .15s,border-color .15s}
+.ops .sym{display:block;font-size:1.4rem;line-height:1.2}
+.ops .nm{display:block;font-size:.8rem;color:var(--muted)}
+.ops input:checked+label{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.ops input:checked+label .nm{color:inherit}
+.actions{display:flex;gap:12px}
+button{font:inherit;font-weight:500;padding:11px 20px;border-radius:6px;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--ink)}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);flex:1}
+button:hover{filter:brightness(.95)}
+.error{min-height:1.4em;margin:14px 0 0;color:var(--error);font-size:.9rem}
+.result{margin-top:8px;padding:18px 20px;background:var(--result);border-radius:6px}
+.result .expr{color:var(--muted);font-size:.9rem;font-variant-numeric:tabular-nums;min-height:1.4em}
+.result .value{font:600 2.25rem/1.3 "IBM Plex Serif",Georgia,serif;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+ul{list-style:none;margin:0;padding:0}
+li{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums;font-size:.95rem}
+li:last-child{border-bottom:0}
+li span:last-child{font-weight:600}
+.empty{color:var(--muted);font-size:.9rem;margin:0}
+.link{margin-top:14px;padding:0;border:0;color:var(--accent);font-size:.875rem}
+</style>
+</head>
+<body>
+<div class="shell">
+  <header>
+    <h1>Precision Arithmetic Calculator</h1>
+    <p>A reliable tool for addition, subtraction, multiplication and division. Inputs are validated before every computation, and each result is recorded in a log for review.</p>
+  </header>
+
+  <div class="grid">
+    <section class="panel" aria-labelledby="calc-h">
+      <h2 id="calc-h">Computation Parameters</h2>
+      <form id="calc" novalidate>
+        <div class="row">
+          <div>
+            <label for="a">Operand A</label>
+            <input id="a" type="number" step="any" inputmode="decimal" placeholder="Enter a value" autocomplete="off">
+          </div>
+          <div>
+            <label for="b">Operand B</label>
+            <input id="b" type="number" step="any" inputmode="decimal" placeholder="Enter a value" autocomplete="off">
+          </div>
+        </div>
+
+        <fieldset>
+          <legend>Select operation</legend>
+          <div class="ops">
+            <div><input type="radio" name="op" id="add" value="+" checked><label for="add"><span class="sym">+</span><span class="nm">Addition</span></label></div>
+            <div><input type="radio" name="op" id="sub" value="-"><label for="sub"><span class="sym">&minus;</span><span class="nm">Subtraction</span></label></div>
+            <div><input type="radio" name="op" id="mul" value="*"><label for="mul"><span class="sym">&times;</span><span class="nm">Multiplication</span></label></div>
+            <div><input type="radio" name="op" id="div" value="/"><label for="div"><span class="sym">&divide;</span><span class="nm">Division</span></label></div>
+          </div>
+        </fieldset>
+
+        <div class="actions">
+          <button type="submit" class="primary">Compute result</button>
+          <button type="reset" id="clear">Reset</button>
+        </div>
+        <p class="error" id="error" role="alert"></p>
+      </form>
+
+      <div class="result" aria-live="polite">
+        <div class="expr" id="expr">Awaiting computation</div>
+        <div class="value" id="value">&mdash;</div>
+      </div>
+    </section>
+
+    <aside class="panel" aria-labelledby="hist-h">
+      <h2 id="hist-h">Calculation Log</h2>
+      <p class="empty" id="empty">No calculations have been recorded in this session.</p>
+      <ul id="history"></ul>
+      <button type="button" class="link" id="clearHistory" hidden>Clear log</button>
+    </aside>
+  </div>
+</div>
+
+<script>
+(function(){
+  var form=document.getElementById('calc'),
+      a=document.getElementById('a'), b=document.getElementById('b'),
+      err=document.getElementById('error'),
+      expr=document.getElementById('expr'), val=document.getElementById('value'),
+      list=document.getElementById('history'), empty=document.getElementById('empty'),
+      clearH=document.getElementById('clearHistory');
+  var SYM={'+':'+','-':'\u2212','*':'\u00d7','/':'\u00f7'};
+  var fmt=new Intl.NumberFormat('en-US',{maximumFractionDigits:10});
+
+  function fail(msg,fields){
+    err.textContent=msg; val.innerHTML='&mdash;';
+    [a,b].forEach(function(f){f.setAttribute('aria-invalid',fields.indexOf(f)>-1?'true':'false');});
+    if(fields[0]) fields[0].focus();
+  }
+
+  function calculate(x,y,op){
+    switch(op){
+      case '+': return x+y;
+      case '-': return x-y;
+      case '*': return x*y;
+      case '/': return x/y;
+    }
+  }
+
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    err.textContent='';
+    var empties=[a,b].filter(function(f){return f.value.trim()==='';});
+    if(empties.length){
+      return fail(empties.length===2?'Both operands are required. Please enter a value for Operand A and Operand B.':'Operand '+(empties[0]===a?'A':'B')+' is required. Please enter a numeric value to continue.',empties);
+    }
+    var x=parseFloat(a.value), y=parseFloat(b.value),
+        op=form.elements['op'].value;
+    if(!isFinite(x)||!isFinite(y)) return fail('Invalid input. Both operands must be valid numbers.',[a,b]);
+    if(op==='/'&&y===0) return fail('Division by zero is undefined. Please enter a non-zero value for Operand B.',[b]);
+
+    [a,b].forEach(function(f){f.setAttribute('aria-invalid','false');});
+    var r=calculate(x,y,op);
+    var text=fmt.format(x)+' '+SYM[op]+' '+fmt.format(y);
+    expr.textContent=text+' =';
+    val.textContent=fmt.format(r);
+    addHistory(text,fmt.format(r));
+  });
+
+  form.addEventListener('reset',function(){
+    err.textContent='';
+    [a,b].forEach(function(f){f.setAttribute('aria-invalid','false');});
+    expr.textContent='Awaiting computation';
+    val.innerHTML='&mdash;';
+    a.focus();
+  });
+
+  function addHistory(text,result){
+    var li=document.createElement('li');
+    var l=document.createElement('span'), r=document.createElement('span');
+    l.textContent=text; r.textContent='= '+result;
+    li.appendChild(l); li.appendChild(r);
+    list.insertBefore(li,list.firstChild);
+    while(list.children.length>8) list.removeChild(list.lastChild);
+    syncHistory();
+  }
+  function syncHistory(){
+    var has=list.children.length>0;
+    empty.hidden=has; clearH.hidden=!has;
+  }
+  clearH.addEventListener('click',function(){list.innerHTML='';syncHistory();});
+  syncHistory();
+})();
+</script>
+</body>
+</html>
