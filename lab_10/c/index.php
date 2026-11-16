@@ -1,3 +1,3 @@
 <?php
-header('Location: a_index.php');
+header('Location: c_age_form.html');
 exit;
