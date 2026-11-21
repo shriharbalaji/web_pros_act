@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ShopEasy product catalogue. Add or edit <product> entries here. -->
+<products>
+  <product id="p1">
+    <name>Wireless Headphones</name>
+    <category>Electronics</category>
+    <price>79.99</price>
+    <stock>12</stock>
+    <emoji>🎧</emoji>
+    <description>Over-ear Bluetooth headphones with 30-hour battery life and active noise isolation.</description>
+  </product>
+  <product id="p2">
+    <name>Smart Watch</name>
+    <category>Electronics</category>
+    <price>149.00</price>
+    <stock>5</stock>
+    <emoji>⌚</emoji>
+    <description>Fitness tracking, heart-rate monitoring and notifications in a lightweight aluminium case.</description>
+  </product>
+  <product id="p3">
+    <name>Running Shoes</name>
+    <category>Fashion</category>
+    <price>64.50</price>
+    <stock>8</stock>
+    <emoji>👟</emoji>
+    <description>Breathable mesh upper with cushioned midsole for everyday running and training.</description>
+  </product>
+  <product id="p4">
+    <name>Coffee Maker</name>
+    <category>Home</category>
+    <price>45.00</price>
+    <stock>10</stock>
+    <emoji>☕</emoji>
+    <description>12-cup drip coffee maker with a programmable timer and keep-warm plate.</description>
+  </product>
+  <product id="p5">
+    <name>Canvas Backpack</name>
+    <category>Accessories</category>
+    <price>39.95</price>
+    <stock>20</stock>
+    <emoji>🎒</emoji>
+    <description>Water-resistant canvas backpack with a padded laptop sleeve and roomy main pocket.</description>
+  </product>
+  <product id="p6">
+    <name>Desk Lamp</name>
+    <category>Home</category>
+    <price>27.49</price>
+    <stock>0</stock>
+    <emoji>💡</emoji>
+    <description>Adjustable LED desk lamp with three colour temperatures and touch dimmer.</description>
+  </product>
+</products>
